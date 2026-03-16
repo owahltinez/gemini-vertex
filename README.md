@@ -43,3 +43,14 @@ If the model you want is only available in a specific Google Cloud region (like 
 export GOOGLE_CLOUD_LOCATION="us-east5"
 ./gemini-vertex "Analyze this data"
 ```
+
+### Handling Shell Aliases
+If your `gemini` command is a shell alias or function rather than a global binary in your `PATH`, Node.js won't be able to execute it directly. You can override the execution command by setting the `GEMINI_COMMAND` environment variable:
+
+```bash
+export GEMINI_COMMAND="npx @google/gemini-cli"
+# Or
+export GEMINI_COMMAND="node /absolute/path/to/gemini/dist/src/index.js"
+
+gemini-vertex "Tell me a joke"
+```
