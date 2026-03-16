@@ -58,7 +58,7 @@ function runGemini(port) {
     GOOGLE_GENAI_USE_VERTEXAI: 'true',
     GOOGLE_VERTEX_BASE_URL: `http://127.0.0.1:${port}`,
     GEMINI_API_KEY_AUTH_MECHANISM: 'bearer',
-    GOOGLE_API_KEY: 'dummy-key-for-proxy', // Prevent SDK crash
+    GOOGLE_API_KEY: 'proxy-placeholder-key', // Prevent SDK crash
   });
 
   if (!env.GOOGLE_CLOUD_LOCATION) {
