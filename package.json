@@ -1,0 +1,17 @@
+{
+  "name": "gemini-vertex",
+  "version": "1.0.0",
+  "description": "Drop-in proxy to use Anthropic Claude models on Vertex AI via the Gemini CLI.",
+  "main": "src/server.js",
+  "scripts": {
+    "test": "node --test src/*.test.js"
+  },
+  "bin": {
+    "gemini-vertex": "./src/gemini-vertex.js"
+  },
+  "dependencies": {
+    "google-auth-library": "^9.6.3"
+  },
+  "author": "",
+  "license": "MIT"
+}
