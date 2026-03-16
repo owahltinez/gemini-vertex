@@ -57,9 +57,12 @@ function runGemini(port) {
   const env = Object.assign({}, process.env, {
     GOOGLE_GENAI_USE_VERTEXAI: 'true',
     GOOGLE_VERTEX_BASE_URL: `http://127.0.0.1:${port}`,
+    GOOGLE_GEMINI_BASE_URL: `http://127.0.0.1:${port}`,
     GEMINI_API_KEY_AUTH_MECHANISM: 'bearer',
-    GOOGLE_API_KEY: 'proxy-placeholder-key', // Prevent SDK crash
+    GEMINI_API_KEY: 'proxy-placeholder-key', // Satisfy CLI and SDK without warnings
   });
+  
+  delete env.GOOGLE_API_KEY; // Ensure GOOGLE_API_KEY is not set to avoid warnings
 
   if (!env.GOOGLE_CLOUD_LOCATION) {
     env.GOOGLE_CLOUD_LOCATION = 'us-east5';
