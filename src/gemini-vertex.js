@@ -15,10 +15,15 @@ let proxyPort = null;
 // Wait for the proxy to output its assigned port
 proxyProcess.stdout.on('data', (data) => {
   const output = data.toString();
-  const match = output.match(/PORT=(\d+)/);
-  if (match && !proxyPort) {
-    proxyPort = match[1];
-    startGemini(proxyPort);
+  if (!proxyPort) {
+    const match = output.match(/PORT=(\d+)/);
+    if (match) {
+      proxyPort = match[1];
+      startGemini(proxyPort);
+    }
+  } else {
+    // Pass through other proxy output
+    process.stdout.write(data);
   }
 });
 
@@ -55,18 +60,14 @@ function startGemini(port) {
 function runGemini(port) {
   // Configure Gemini CLI environment variables for the proxy
   const env = Object.assign({}, process.env, {
-    GOOGLE_GENAI_USE_VERTEXAI: 'true',
-    GOOGLE_VERTEX_BASE_URL: `http://127.0.0.1:${port}`,
     GOOGLE_GEMINI_BASE_URL: `http://127.0.0.1:${port}`,
-    GEMINI_API_KEY_AUTH_MECHANISM: 'bearer',
-    GEMINI_API_KEY: 'proxy-placeholder-key', // Satisfy CLI and SDK without warnings
+    GEMINI_API_KEY: 'AIzaSy-proxy-placeholder',
+    GOOGLE_API_KEY: 'AIzaSy-proxy-placeholder',
   });
   
-  delete env.GOOGLE_API_KEY; // Ensure GOOGLE_API_KEY is not set to avoid warnings
-
-  if (!env.GOOGLE_CLOUD_LOCATION) {
-    env.GOOGLE_CLOUD_LOCATION = 'us-east5';
-  }
+  delete env.GOOGLE_GENAI_USE_VERTEXAI;
+  delete env.GOOGLE_VERTEX_BASE_URL;
+  delete env.GEMINI_API_KEY_AUTH_MECHANISM;
 
   const args = process.argv.slice(2);
   

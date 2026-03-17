@@ -60,7 +60,9 @@ async function getAuthToken(req) {
     if (tokenResponse && tokenResponse.token) {
       return `Bearer ${tokenResponse.token}`;
     }
-  } catch (e) {}
+  } catch (e) {
+    // console.error("PROXY: Failed to get token from ADC:", e.message);
+  }
 
   const authHeader = req.headers['authorization'];
   if (authHeader && !authHeader.includes('proxy-placeholder-key') && authHeader.startsWith('Bearer ya29.')) {
@@ -91,7 +93,7 @@ async function handleRequest(req, res) {
         try {
           projectId = await auth.getProjectId();
         } catch(e) {
-          console.error("PROXY ERROR: Failed to get project ID from ADC.", e.message);
+          // console.error("PROXY ERROR: Failed to get project ID from ADC.", e.message);
         }
       }
 
@@ -100,13 +102,14 @@ async function handleRequest(req, res) {
       
       const token = await getAuthToken(req);
       if (!token || !projectId) {
-        console.error("PROXY ERROR: No valid OAuth token or Project ID found.");
+        console.error("\n[gemini-vertex] PROXY ERROR: No valid OAuth token or Project ID found.");
         console.error("Please run: gcloud auth application-default login && gcloud config set project YOUR_PROJECT_ID");
+        console.error("Alternatively, set GOOGLE_CLOUD_PROJECT and GOOGLE_ACCESS_TOKEN environment variables.\n");
         res.writeHead(401, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ 
           error: { 
             code: 401, 
-            message: "Unauthenticated. Please run 'gcloud auth application-default login' and ensure your default project is set or GOOGLE_CLOUD_PROJECT environment variable is set." 
+            message: "Unauthenticated. Please run 'gcloud auth application-default login' and ensure your default project is set." 
           } 
         }));
         return;
@@ -140,7 +143,7 @@ async function handleRequest(req, res) {
           let errBody = '';
           proxyRes.on('data', c => errBody += c.toString());
           proxyRes.on('end', () => {
-            res.writeHead(proxyRes.statusCode);
+            res.writeHead(proxyRes.statusCode, { 'Content-Type': 'application/json' });
             res.end(errBody);
           });
           return;
@@ -190,13 +193,15 @@ async function handleRequest(req, res) {
         }
       });
 
-      proxyReq.on('error', () => {
+      proxyReq.on('error', (err) => {
+        console.error("[gemini-vertex] PROXY ERROR: Failed to connect to upstream:", err.message);
         res.writeHead(500); res.end();
       });
 
       proxyReq.write(JSON.stringify(payload));
       proxyReq.end();
     } catch (err) {
+      console.error("[gemini-vertex] PROXY ERROR:", err.message);
       res.writeHead(500); res.end();
     }
   });
