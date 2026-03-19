@@ -71,13 +71,13 @@ function runGemini(port) {
 
   const args = process.argv.slice(2);
   
-  // Allow users to override the 'gemini' command if it's an alias or not in PATH
-  const commandString = process.env.GEMINI_COMMAND || 'gemini';
+  // Default to the latest version of gemini-cli via npx to avoid cache issues
+  const commandString = process.env.GEMINI_COMMAND || 'npx --yes @google/gemini-cli@latest';
   const commandParts = commandString.split(' ');
   const cmd = commandParts[0];
   const cmdArgs = commandParts.slice(1).concat(args);
   
-  // Pass control to the globally installed gemini CLI
+  // Pass control to the gemini CLI
   const geminiProcess = spawn(cmd, cmdArgs, {
     stdio: 'inherit',
     env
@@ -88,7 +88,7 @@ function runGemini(port) {
       console.error(`\n[gemini-vertex] Error: Could not execute '${cmd}'.`);
       console.error(`If 'gemini' is a shell alias or function, Node.js cannot execute it directly.`);
       console.error(`\nPlease set the GEMINI_COMMAND environment variable to point to the actual binary or an npx command. For example:`);
-      console.error(`  export GEMINI_COMMAND="npx @google/gemini-cli"`);
+      console.error(`  export GEMINI_COMMAND="npx --yes @google/gemini-cli@latest"`);
       console.error(`  export GEMINI_COMMAND="node /path/to/gemini/dist/src/index.js"`);
       console.error(`\nThen try running gemini-vertex again.\n`);
     } else {

@@ -48,7 +48,7 @@ export GOOGLE_CLOUD_LOCATION="us-east5"
 If your `gemini` command is a shell alias or function rather than a global binary in your `PATH`, Node.js won't be able to execute it directly. You can override the execution command by setting the `GEMINI_COMMAND` environment variable:
 
 ```bash
-export GEMINI_COMMAND="npx @google/gemini-cli"
+export GEMINI_COMMAND="npx --yes @google/gemini-cli@latest"
 # Or
 export GEMINI_COMMAND="node /absolute/path/to/gemini/dist/src/index.js"
 
